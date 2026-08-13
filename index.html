@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseNest — Know what's left on the 19th</title>
+<meta name="description" content="A household budget laid out day by day. Built in Newfoundland for Canadian households, with RRSPs, TFSAs, RESPs and the CCB built in. Your data stays in your own Dropbox.">
+<link rel="icon" type="image/svg+xml" href="wisenest-icon.svg">
+<meta property="og:title" content="WiseNest — Know what's left on the 19th">
+<meta property="og:description" content="A household budget laid out day by day. Built in Newfoundland for Canadian households.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wisenest.ca/">
+<meta name="theme-color" content="#02182C">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Karla:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#02182C;
+    --ink-2:#06263F;
+    --ink-3:#0C3552;
+    --line:#16405F;
+    --paper:#EEF3F7;
+    --slate:#8CA6BE;
+    --nest:#75BC8D;
+    --nest-dim:#4E8C68;
+
+    --display:'Fraunces',Georgia,serif;
+    --body:'Karla',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --gut:clamp(20px,5vw,64px);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+
+  /* Faint ledger rule background — the page itself is a sheet of accounting paper */
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px);
+    background-size:100% 34px;
+    opacity:.16;
+    mask-image:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);
+  }
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 var(--gut)}
+
+  /* ── header ── */
+  header{padding:26px 0 0}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .brand img{width:38px;height:38px;display:block;border-radius:9px}
+  .brand span{font-family:var(--display);font-size:1.35rem;font-weight:600;letter-spacing:-.02em}
+  .brand span em{font-style:normal;color:var(--nest)}
+
+  .btn{
+    display:inline-block;border:1px solid var(--nest);border-radius:999px;
+    padding:11px 22px;background:transparent;color:var(--nest);
+    font-family:var(--body);font-size:.95rem;font-weight:600;
+    text-decoration:none;cursor:pointer;transition:background .18s,color .18s;
+  }
+  .btn:hover,.btn:focus-visible{background:var(--nest);color:var(--ink)}
+  .btn-solid{background:var(--nest);color:var(--ink);border-color:var(--nest)}
+  .btn-solid:hover,.btn-solid:focus-visible{background:#8ed0a3;border-color:#8ed0a3}
+  :focus-visible{outline:2px solid var(--nest);outline-offset:3px}
+
+  /* ── hero ── */
+  .hero{padding:clamp(48px,9vw,104px) 0 clamp(40px,6vw,72px)}
+  .eyebrow{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--slate);margin:0 0 20px;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(2.6rem,7.2vw,4.6rem);
+    font-weight:600;line-height:1.02;letter-spacing:-.03em;
+    margin:0 0 22px;max-width:15ch;
+  }
+  h1 .dim{color:var(--slate)}
+  .lede{font-size:clamp(1.05rem,2.2vw,1.25rem);color:var(--slate);max-width:52ch;margin:0 0 30px}
+  .lede strong{color:var(--paper);font-weight:500}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .hero-note{font-family:var(--mono);font-size:.76rem;color:var(--slate)}
+
+  /* ── the calendar: the signature ── */
+  .cal{
+    margin-top:clamp(40px,6vw,66px);
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:clamp(16px,3vw,26px);
+  }
+  .cal-top{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:14px;flex-wrap:wrap;margin-bottom:16px;
+  }
+  .cal-month{font-family:var(--display);font-size:1.5rem;font-weight:600;letter-spacing:-.02em}
+  .cal-key{display:flex;gap:16px;font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+  .cal-key i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .k-in{background:var(--nest)}
+  .k-out{background:var(--slate)}
+
+  .dow{
+    display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;
+    font-family:var(--mono);font-size:.68rem;color:var(--slate);text-align:center;
+  }
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .day{
+    min-height:86px;border-radius:9px;background:var(--ink);
+    border:1px solid transparent;padding:7px 7px 6px;
+    display:flex;flex-direction:column;gap:4px;
+    opacity:0;transform:translateY(6px);
+    animation:rise .5s cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  .day.blank{background:transparent;animation:none;opacity:1;transform:none;min-height:0}
+  .day .n{font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+  .day.tight{border-color:var(--nest-dim);background:#07283f}
+  .amt{font-family:var(--mono);font-size:.7rem;line-height:1.35;letter-spacing:-.02em}
+  .in{color:var(--nest)}
+  .out{color:#B9CBDB}
+  .lbl{display:block;font-size:.62rem;color:var(--slate);letter-spacing:.02em}
+
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  .cal-foot{
+    margin-top:16px;padding-top:15px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:8px 26px;align-items:baseline;
+  }
+  .verdict{font-family:var(--display);font-size:1.12rem;font-weight:600}
+  .verdict b{color:var(--nest);font-weight:600}
+  .verdict-sub{font-family:var(--mono);font-size:.74rem;color:var(--slate)}
+
+  /* ── sections ── */
+  section{padding:clamp(56px,9vw,104px) 0}
+  .rule{height:1px;background:var(--line);border:0;margin:0}
+  h2{
+    font-family:var(--display);font-size:clamp(1.8rem,4.2vw,2.7rem);
+    font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:0 0 18px;max-width:20ch;
+  }
+  .sec-lede{color:var(--slate);max-width:56ch;margin:0 0 40px;font-size:1.05rem}
+
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:clamp(24px,4vw,44px)}
+  .col h3{
+    font-family:var(--body);font-size:1.05rem;font-weight:600;
+    margin:0 0 9px;letter-spacing:-.01em;
+  }
+  .col p{margin:0;color:var(--slate);font-size:.97rem}
+  .col .tag{
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--nest-dim);display:block;margin-bottom:13px;
+  }
+
+  /* Canadian terms, set as ledger entries rather than a bullet list */
+  .terms{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+  .term{
+    font-family:var(--mono);font-size:.78rem;color:var(--paper);
+    border:1px solid var(--line);border-radius:7px;padding:6px 12px;background:var(--ink-2);
+  }
+
+  .split{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,56px);align-items:start}
+  @media(min-width:860px){.split{grid-template-columns:1.05fr .95fr}}
+
+  .card{
+    background:var(--ink-2);border:1px solid var(--line);
+    border-radius:14px;padding:clamp(20px,3vw,30px);
+  }
+  .card h3{font-family:var(--body);font-size:1rem;font-weight:600;margin:0 0 10px}
+  .card p{margin:0 0 16px;color:var(--slate);font-size:.95rem}
+  .card p:last-child{margin-bottom:0}
+  .flow{display:flex;flex-direction:column;gap:0;font-family:var(--mono);font-size:.8rem}
+  .flow div{padding:11px 0;border-bottom:1px solid var(--line);color:var(--slate)}
+  .flow div:last-child{border-bottom:0}
+  .flow b{color:var(--paper);font-weight:500}
+
+  /* ── maker ── */
+  .maker{max-width:62ch}
+  .maker p{color:var(--slate);font-size:1.05rem}
+  .maker p strong{color:var(--paper);font-weight:500}
+
+  /* ── waitlist ── */
+  .signup{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:clamp(26px,5vw,52px)}
+  .signup h2{margin-bottom:12px}
+  form{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;max-width:520px}
+  input[type=email]{
+    flex:1;min-width:220px;
+    background:var(--ink);border:1px solid var(--line);border-radius:999px;
+    color:var(--paper);font-family:var(--body);font-size:16px;padding:13px 20px;
+  }
+  input[type=email]::placeholder{color:var(--slate)}
+  .fineprint{font-family:var(--mono);font-size:.72rem;color:var(--slate);margin-top:16px}
+
+  footer{padding:44px 0 60px;color:var(--slate);font-family:var(--mono);font-size:.76rem}
+  .foot-row{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;align-items:center}
+  footer a{color:var(--slate);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:hover{color:var(--paper)}
+
+  @media(max-width:640px){
+    .day{min-height:62px;padding:5px}
+    .day .n{font-size:.66rem}
+    .amt{font-size:.6rem}
+    .lbl{display:none}
+    .cal-key{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .day{animation:none;opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="bar">
+      <a class="brand" href="/">
+        <img src="wisenest-icon.svg" alt="">
+        <span>Wise<em>Nest</em></span>
+      </a>
+      <a class="btn" href="#waitlist">Join the waitlist</a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <p class="eyebrow">Household budgeting · Made in Newfoundland</p>
+    <h1>Know what's left <span class="dim">on the 19th.</span></h1>
+    <p class="lede">Most budgets tell you how the month went. WiseNest lays it out day by day, so you can see the
+      <strong>tight stretch between payday and the mortgage</strong> before you're standing in it.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#waitlist">Join the waitlist</a>
+      <span class="hero-note">Coming to iPhone · Free trial at launch</span>
+    </div>
+
+    <!-- The month grid is the product's whole argument, so it is the hero. -->
+    <div class="cal" role="img" aria-label="A sample August budget shown as a calendar. Pay arrives on the 6th, 13th, 20th and 27th; the house payment leaves on the 14th; the tightest day of the month is the 19th, with $340 remaining the day before the next pay.">
+      <div class="cal-top">
+        <div class="cal-month">August</div>
+        <div class="cal-key">
+          <span><i class="k-in"></i>money in</span>
+          <span><i class="k-out"></i>money out</span>
+        </div>
+      </div>
+      <div class="dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="grid" id="grid" aria-hidden="true"></div>
+      <div class="cal-foot">
+        <div class="verdict">Tightest day: <b>Wed 19 Aug</b> — $340 left</div>
+        <div class="verdict-sub">the day before pay lands</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<div class="wrap">
+  <section>
+    <h2>It speaks Canadian.</h2>
+    <p class="sec-lede">Most budgeting apps are built for American households and quietly assume American accounts.
+      WiseNest was built here, for the money a Canadian family actually deals with.</p>
+    <div class="cols">
+      <div class="col">
+        <span class="tag">Registered accounts</span>
+        <h3>RRSPs, TFSAs and RESPs sit alongside everything else</h3>
+        <p>Track balances month to month and watch the trend, without pretending a registered account is just another savings account.</p>
+      </div>
+      <div class="col">
+        <span class="tag">Benefits</span>
+        <h3>The CCB lands on the calendar like any other pay</h3>
+        <p>Child benefit, pension, part-time shifts, irregular hours. Income that varies is the normal case, not an edge case.</p>
+      </div>
+      <div class="col">
+        <span class="tag">Side income</span>
+        <h3>A business section for the work on the side</h3>
+        <p>Bookings, expenses, and profit kept apart from the household books — so you can see the business clearly and still know the family total.</p>
+      </div>
+    </div>
+    <div class="terms" aria-label="Terms WiseNest understands">
+      <span class="term">RRSP</span><span class="term">TFSA</span><span class="term">RESP</span>
+      <span class="term">CCB</span><span class="term">HISA</span><span class="term">Line of credit</span>
+      <span class="term">Bi-weekly pay</span><span class="term">Mortgage renewal</span>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="split">
+      <div>
+        <h2>Your numbers never touch our servers.</h2>
+        <p class="sec-lede">WiseNest doesn't connect to your bank, and it doesn't hold your data. You type your money in,
+          and it syncs to a single file in your own Dropbox. We can't read it, because we never have it.</p>
+        <p class="sec-lede" style="margin-bottom:0">That also means no monthly fee for storage we're not paying for.
+          Buy it once.</p>
+      </div>
+      <div class="card">
+        <h3>Where a WiseNest budget lives</h3>
+        <div class="flow">
+          <div><b>Your phone</b> — the app, working offline</div>
+          <div><b>Your Dropbox</b> — one file, in a folder only WiseNest can see</div>
+          <div><b>Your other devices</b> — the same file, kept in step</div>
+          <div>Our servers — <b>nothing</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="maker">
+      <h2>Built at a kitchen table, not a startup.</h2>
+      <p>I'm a licensed practical nurse in Mount Pearl. I built WiseNest because my wife and I needed to know
+        what was actually left between paycheques — with a mortgage, kids, and her face-painting business
+        running alongside it all.</p>
+      <p>It got good enough that people started asking for a copy. <strong>Everything in it is there because
+        our household needed it,</strong> which is a slower way to build an app and, I think, a better one.</p>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section id="waitlist">
+    <div class="signup">
+      <h2>Be one of the first to try it.</h2>
+      <p class="sec-lede" style="margin-bottom:0">Leave your email and I'll write once, when it's ready.
+        No newsletter, no drip campaign — I'd rather send one useful message than twelve forgettable ones.</p>
+      <!-- Swap the action for your own Formspree (or similar) endpoint before going live. -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <label for="email" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email address</label>
+        <input id="email" type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+        <button class="btn btn-solid" type="submit">Keep me posted</button>
+      </form>
+      <p class="fineprint">One email, at launch. Unsubscribe is a reply saying so.</p>
+    </div>
+  </section>
+</div>
+
+<hr class="rule">
+
+<div class="wrap">
+  <footer>
+    <div class="foot-row">
+      <span>© 2026 WiseNest · Mount Pearl, Newfoundland and Labrador</span>
+      <span><a href="mailto:hello@wisenest.ca">hello@wisenest.ca</a></span>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // A realistic month for a two-income household: bi-weekly pay on opposite
+  // weeks, the CCB on the 20th, and the mortgage on the 21st — which is what
+  // creates the squeeze the headline is about.
+  // A real month for a two-income household. The numbers are internally
+  // consistent: starting from $1,052, the running balance bottoms out at $340
+  // on the 19th — the day before Karla's pay lands. That is the squeeze the
+  // headline is about, and it is why the month grid is the hero.
+  const EVENTS = {
+    2:  [['out','96','Fuel']],
+    4:  [['out','238','Groceries']],
+    5:  [['in','340','Booking']],
+    6:  [['in','1,197','Karla pay']],
+    7:  [['out','118','Phone']],
+    8:  [['out','264','Daycare']],
+    11: [['out','211','Groceries']],
+    12: [['out','143','Internet']],
+    13: [['in','1,800','Chad pay']],
+    14: [['out','1,798','House']],
+    15: [['out','486','Car + insurance']],
+    17: [['out','224','Hydro']],
+    18: [['out','207','Groceries']],
+    19: [['out','264','Daycare']],
+    20: [['in','1,197','Karla pay'],['in','259','CCB']],
+    22: [['out','180','Credit card']],
+    25: [['out','219','Groceries']],
+    26: [['out','110','Fuel']],
+    27: [['in','1,800','Chad pay']],
+    28: [['out','264','Daycare']],
+    30: [['out','100','RRSP']],
+  };
+  const FIRST_DOW = 6;   // 1 Aug 2026 is a Saturday
+  const DAYS = 31;
+  const TIGHT = 19;
+
+  const grid = document.getElementById('grid');
+  let html = '';
+  for (let i = 0; i < FIRST_DOW; i++) html += '<div class="day blank"></div>';
+  for (let d = 1; d <= DAYS; d++) {
+    const ev = EVENTS[d] || [];
+    const rows = ev.map(([dir, amt, lbl]) =>
+      '<span class="amt ' + dir + '">' + (dir === 'in' ? '+' : '−') + '$' + amt +
+      '<span class="lbl">' + lbl + '</span></span>').join('');
+    html += '<div class="day' + (d === TIGHT ? ' tight' : '') + '" style="animation-delay:' +
+            (18 * d) + 'ms"><span class="n">' + d + '</span>' + rows + '</div>';
+  }
+  grid.innerHTML = html;
+</script>
+
+</body>
+</html>
