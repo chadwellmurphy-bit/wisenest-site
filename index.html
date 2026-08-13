@@ -184,21 +184,9 @@
   .flow div:last-child{border-bottom:0}
   .flow b{color:var(--paper);font-weight:500}
 
-  /* ── maker ── */
-  .maker{max-width:62ch}
-  .maker p{color:var(--slate);font-size:1.05rem}
-  .maker p strong{color:var(--paper);font-weight:500}
-
   /* ── free-to-use CTA ── */
   .signup{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:clamp(26px,5vw,52px)}
   .signup h2{margin-bottom:12px}
-  form{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;max-width:520px}
-  input[type=email]{
-    flex:1;min-width:220px;
-    background:var(--ink);border:1px solid var(--line);border-radius:999px;
-    color:var(--paper);font-family:var(--body);font-size:16px;padding:13px 20px;
-  }
-  input[type=email]::placeholder{color:var(--slate)}
   .fineprint{font-family:var(--mono);font-size:.72rem;color:var(--slate);margin-top:16px}
 
   footer{padding:44px 0 60px;color:var(--slate);font-family:var(--mono);font-size:.76rem}
@@ -243,9 +231,9 @@
     </div>
 
     <!-- The month grid is the product's whole argument, so it is the hero. -->
-    <div class="cal" role="img" aria-label="A sample August budget shown as a calendar. Pay arrives on the 6th, 13th, 20th and 27th; the house payment leaves on the 14th; the tightest day of the month is the 19th, with $340 remaining the day before the next pay.">
+    <div class="cal" role="img" aria-label="A sample month's budget shown as a calendar. Pay arrives on the 6th, 13th, 20th and 27th; the house payment leaves on the 14th; the tightest day is the 19th, with $340 remaining the day before the next pay.">
       <div class="cal-top">
-        <div class="cal-month">August</div>
+        <div class="cal-month" id="cal-month">August</div>
         <div class="cal-key">
           <span><i class="k-in"></i>money in</span>
           <span><i class="k-out"></i>money out</span>
@@ -254,7 +242,7 @@
       <div class="dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
       <div class="grid" id="grid" aria-hidden="true"></div>
       <div class="cal-foot">
-        <div class="verdict">Tightest day: <b>Wed 19 Aug</b> — $340 left</div>
+        <div class="verdict" id="verdict">Tightest day: <b>Wed 19 Aug</b> — $340 left</div>
         <div class="verdict-sub">the day before pay lands</div>
       </div>
     </div>
@@ -300,8 +288,8 @@
         <h2>Your numbers never touch our servers.</h2>
         <p class="sec-lede">WiseNest doesn't connect to your bank, and it doesn't hold your data. You type your money in,
           and it syncs to a single file in your own Dropbox. We can't read it, because we never have it.</p>
-        <p class="sec-lede" style="margin-bottom:0">That also means no monthly fee for storage we're not paying for.
-          Buy it once.</p>
+        <p class="sec-lede" style="margin-bottom:0">That also means there's no storage bill to pass on to you — which is why
+          WiseNest won't ever be a monthly subscription.</p>
       </div>
       <div class="card">
         <h3>Where a WiseNest budget lives</h3>
@@ -386,7 +374,8 @@
         <a class="btn btn-solid" href="https://app.wisenest.ca/">Open WiseNest</a>
         <span class="hero-note">Free while in development</span>
       </div>
-      <p class="fineprint">Sync is optional. Without it, your budget stays on the device you're using.</p>
+      <p class="fineprint">Sync is optional. Without it, your budget stays on the device you're using.<br>
+        Free while WiseNest is in development. If that changes, it will be a one-time price — never a subscription.</p>
     </div>
   </section>
 </div>
@@ -433,9 +422,23 @@
     28: [['out','264','Daycare']],
     30: [['out','100','RRSP']],
   };
-  const FIRST_DOW = 6;   // 1 Aug 2026 is a Saturday
-  const DAYS = 31;
+  // The demo month follows the real calendar, so the page never shows a month
+  // that has already gone by. The events sit on fixed day numbers: 6/13/20/27
+  // stay a week apart in any month, so two people paid bi-weekly on opposite
+  // weeks still reads correctly whatever month it is.
   const TIGHT = 19;
+  const now   = new Date();
+  const Y = now.getFullYear(), M = now.getMonth();
+  const FIRST_DOW = new Date(Y, M, 1).getDay();
+  const DAYS      = new Date(Y, M + 1, 0).getDate();
+
+  document.getElementById('cal-month').textContent =
+    now.toLocaleDateString('en-CA', { month: 'long' });
+  const tightDate = new Date(Y, M, TIGHT);
+  const dowShort  = tightDate.toLocaleDateString('en-CA', { weekday: 'short' });
+  const monShort  = tightDate.toLocaleDateString('en-CA', { month: 'short' });
+  document.getElementById('verdict').innerHTML =
+    'Tightest day: <b>' + dowShort + ' ' + TIGHT + ' ' + monShort + '</b> \u2014 $340 left';
 
   const grid = document.getElementById('grid');
   let html = '';
